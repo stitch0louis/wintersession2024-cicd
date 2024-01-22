@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - other-brach
+      - other-branch
   workflow_dispatch:
 
 jobs:
@@ -13,29 +13,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - name: Install Python package
-        run: python -m pip instabill .[test]
+        run: python -m pip install .[test]
       - name: Run tests
-        run: python - m pytest
+        run: python -m pytest
 
-    matrix-text:
-      strategy:
-        matrix:
-          os: [ubuntu-latest, windows-latest]
-          python-version: ["3.9", "3.11"]
-          include:
-            - os: macos-latest
-              python-version: "3.10"
-          runs-on: ${{matrix.os}}
-          steps:
-          - uses: actions/checkout@v4
-          - uses: actions/setup-python@v4
-            with:
-              python-version: "3.11"
-          - name: Install Python package
-            run: python -m pip instabill .[test]
-          - name: Run tests
-            run: python - m pytest
+  matrix-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.9", "3.11"]
+        include:
+          - os: macos-latest
+            python-version: "3.10"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Python package
+        run: python -m pip install .[test]
+      - name: Run tests
+        run: python -m pytest
+      - name: Example step that runs on Linux
+        if: runner.os == 'Linux'
+        run: echo "This is Linux"
+      - name: This step generates output
+        id: step-with-output
+        run: echo "some-variable=something" >> $GITHUB_OUTPUT
+      - run: echo "${{ steps.step-with-output.outputs.some-variable }}"
