@@ -6,7 +6,7 @@ on:
     branches:
       - main
       - other-brach
-  workflow_dispath:
+  workflow_dispatch:
 
 jobs:
   test:
